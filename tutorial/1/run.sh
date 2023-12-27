@@ -1,3 +1,3 @@
 #!/bin/sh
 
-exec uvicorn example_project.app:app
+exec flask --app example_project.app:app run
