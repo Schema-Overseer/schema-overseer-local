@@ -1,5 +1,7 @@
-from flask import Flask, request, Response
 from flasgger import Swagger
+from flask import Flask, Response, request
+
+from .payloads import UnexpectedPayload, build_log_entry
 
 app = Flask(__name__)
 swagger = Swagger(
@@ -10,7 +12,7 @@ swagger = Swagger(
         "openapi": "3.0.3",
         "title": "Swagger | Example Project",
         "info": {
-            "version": "1.2",
+            "version": "1.3",
             "title": "Example Project",
         },
     },
@@ -54,17 +56,11 @@ def log_site_search():
               schema:
                 type: string
     """
-    payload = request.get_json()
+    payload_dict = request.get_json()
 
-    if "query" in payload:
-        log_entry = payload["query"]
-
-    elif "text" in payload or "image" in payload:
-        text_log_entry = payload.get("text", "<no text>")
-        image_log_entry = payload.get("image", "empty")
-        log_entry = f'{text_log_entry} | <image "{image_log_entry}">'
-
-    else:
+    try:
+        log_entry = build_log_entry(payload_dict)
+    except UnexpectedPayload:
         return Response("Invalid payload scheme", status=400)
 
     message = f'User query for logging: "{log_entry}"'

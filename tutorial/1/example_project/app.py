@@ -8,6 +8,7 @@ swagger = Swagger(
     | {
         "specs_route": "/",
         "openapi": "3.0.3",
+        "title": "Swagger | Example Project",
         "info": {
             "version": "1.1",
             "title": "Example Project",
