@@ -23,7 +23,7 @@ class NewPayload(BasePayload):
         return f'{text_log_entry} | <image "{image_log_entry}">'
 
 
-class UnexpectedPayload(Exception):
+class InvalidPayload(Exception):
     pass
 
 
@@ -42,4 +42,4 @@ def build_log_entry(value: dict) -> str:
         except ValidationError:
             continue
     else:
-        raise UnexpectedPayload("No suitable payload scheme found for given input")
+        raise InvalidPayload("No suitable payload scheme found for given input")

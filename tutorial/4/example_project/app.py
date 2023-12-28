@@ -1,7 +1,8 @@
 from flasgger import Swagger
 from flask import Flask, Response, request
+from schema_overseer_local import InvalidScheme
 
-from .payloads import InvalidPayload, build_log_entry
+from .payload import payload_schema_registry
 
 app = Flask(__name__)
 swagger = Swagger(
@@ -12,11 +13,13 @@ swagger = Swagger(
         "openapi": "3.0.3",
         "title": "Swagger | Example Project",
         "info": {
-            "version": "1.3",
+            "version": "1.4",
             "title": "Example Project",
         },
     },
 )
+
+payload_schema_registry.setup()
 
 
 @app.post("/log-site-search")
@@ -32,6 +35,8 @@ def log_site_search():
                   text:
                     type: string
                   image:
+                    type: string
+                  create_at:
                     type: string
                 type: object
               - properties:
@@ -59,11 +64,11 @@ def log_site_search():
     payload_dict = request.get_json()
 
     try:
-        log_entry = build_log_entry(payload_dict)
-    except InvalidPayload:
+        context = payload_schema_registry.build(payload_dict)
+    except InvalidScheme:
         return Response("Invalid payload scheme", status=400)
 
-    message = f'User query for logging: "{log_entry}"'
+    message = f'User query for logging: "{context.log_entry}" at {context.log_datetime}'
 
     # In a real life we would save processed payload in some kind of a database
     return message
