@@ -64,7 +64,7 @@ def log_site_search() -> str:
     payload_dict = request.get_json()
 
     try:
-        context = payload_schema_registry.build(payload_dict)
+        context = payload_schema_registry.build(source_dict=payload_dict)
     except InvalidScheme:
         abort(Response("Invalid payload scheme", status=400))
 

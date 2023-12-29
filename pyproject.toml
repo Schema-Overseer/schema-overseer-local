@@ -5,24 +5,34 @@ description = ""
 authors = ["Nik Sergievskii <nnonexistent@gmail.com>"]
 packages = [{ include = "schema_overseer_local" }]
 
+
 [tool.poetry.dependencies]
 pydantic = "^2.5.3"
 python = "3.8"
+
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.8.0"
 ruff = "^0.1.9"
 
+
+[tool.poetry.group.text.dependencies]
+pytest = "^7.4.3"
+
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+
 [tool.ruff]
 line-length = 119
+
 
 [tool.ruff.lint]
 select = ["E1", "E4", "E7", "E9", "F", "W"]
 ignore = ["E731"]
+
 
 [tool.mypy]
 ignore_missing_imports = true
