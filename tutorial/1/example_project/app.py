@@ -2,10 +2,9 @@ from flask import Flask, request
 from flasgger import Swagger
 
 app = Flask(__name__)
-swagger = Swagger(
-    app,
-    config=Swagger.DEFAULT_CONFIG
-    | {
+swagger_config = Swagger.DEFAULT_CONFIG.copy()
+swagger_config.update(
+    {
         "specs_route": "/",
         "openapi": "3.0.3",
         "title": "Swagger | Example Project",
@@ -13,12 +12,14 @@ swagger = Swagger(
             "version": "1.1",
             "title": "Example Project",
         },
-    },
+    }
 )
+Swagger(app, config=swagger_config)
+
 
 
 @app.post("/log-site-search")
-def log_site_search():
+def log_site_search() -> str:
     """Log site search queries
     ---
     requestBody:

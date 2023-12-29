@@ -6,10 +6,9 @@ from schema_overseer_local import InvalidScheme
 from .payload.registry import payload_schema_registry
 
 app = Flask(__name__)
-swagger = Swagger(
-    app,
-    config=Swagger.DEFAULT_CONFIG
-    | {
+swagger_config = Swagger.DEFAULT_CONFIG.copy()
+swagger_config.update(
+    {
         "specs_route": "/",
         "openapi": "3.0.3",
         "title": "Swagger | Example Project",
@@ -17,9 +16,9 @@ swagger = Swagger(
             "version": "1.4",
             "title": "Example Project",
         },
-    },
+    }
 )
-
+Swagger(app, config=swagger_config)
 payload_schema_registry.setup()
 
 

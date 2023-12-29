@@ -1,5 +1,5 @@
 from inspect import signature
-from typing import Any, Callable, Generic, TypeVar, cast
+from typing import Any, Callable, Generic, Optional, TypeVar, cast, Type, List, Dict
 
 from pydantic import BaseModel, ValidationError
 
@@ -15,18 +15,18 @@ SchemeModel = TypeVar("SchemeModel", bound=BaseModel)
 
 
 class SchemaRegistry(Generic[Ctx]):
-    _context_type: type[Ctx]
-    _discovery_paths: list[str]
-    _storage: dict[type[BaseModel], Callable[[BaseModel], Ctx] | None]
+    _context_type: Type[Ctx]
+    _discovery_paths: List[str]
+    _storage: Dict[Type[BaseModel], Optional[Callable[[BaseModel], Ctx]]]
     _setup_done: bool
 
-    def __init__(self, context_type: type[Ctx], discovery_paths: list[str]) -> None:
+    def __init__(self, context_type: Type[Ctx], discovery_paths: List[str]) -> None:
         self._context_type = context_type
         self._discovery_paths = discovery_paths
         self._storage = {}
         self._setup_done = False
 
-    def add_scheme(self, model: type[SchemeModel]) -> type[SchemeModel]:
+    def add_scheme(self, model: Type[SchemeModel]) -> Type[SchemeModel]:
         self._storage[model] = None
         return model
 
@@ -52,7 +52,7 @@ class SchemaRegistry(Generic[Ctx]):
         assert not any(builder is None for builder in self._storage.values())
         self._setup_done = True
 
-    def build(self, data: dict[str, Any]) -> Ctx:
+    def build(self, data: Dict[str, Any]) -> Ctx:
         assert self._setup_done
 
         for model, builder in self._storage.items():

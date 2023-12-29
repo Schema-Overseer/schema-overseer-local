@@ -7,12 +7,11 @@ packages = [{ include = "schema_overseer_local" }]
 
 [tool.poetry.dependencies]
 pydantic = "^2.5.3"
-python = "3.12.1"
+python = "3.8"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.8.0"
 ruff = "^0.1.9"
-ipython = "^8.19.0"
 
 [build-system]
 requires = ["poetry-core"]
