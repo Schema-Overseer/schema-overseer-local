@@ -2,7 +2,7 @@ from flasgger import Swagger
 from flask import Flask, Response, request
 from schema_overseer_local import InvalidScheme
 
-from .payload import payload_schema_registry
+from .payload.registry import payload_schema_registry
 
 app = Flask(__name__)
 swagger = Swagger(

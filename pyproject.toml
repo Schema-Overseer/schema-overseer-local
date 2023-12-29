@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "schema-overseer-local"
+version = "0.1.0"
+description = ""
+authors = ["Nik Sergievskii <nnonexistent@gmail.com>"]
+packages = [{ include = "schema_overseer_local" }]
+
+[tool.poetry.dependencies]
+pydantic = "^2.5.3"
+python = "3.12.1"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.8.0"
+ruff = "^0.1.9"
+ipython = "^8.19.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+line-length = 119
+
+[tool.ruff.lint]
+select = ["E1", "E4", "E7", "E9", "F", "W"]
+ignore = ["E731"]
+
+[tool.mypy]
+ignore_missing_imports = true
+plugins = ["pydantic.mypy"]
+check_untyped_defs = true

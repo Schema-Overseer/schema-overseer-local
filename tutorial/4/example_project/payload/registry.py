@@ -11,7 +11,7 @@ class LogContext:
 payload_schema_registry = SchemaRegistry(
     "payload",
     LogContext,
-    discovery_path=[
+    discovery_paths=[
         "example_project.payload.models",
         "example_project.payload.builders",
     ],
