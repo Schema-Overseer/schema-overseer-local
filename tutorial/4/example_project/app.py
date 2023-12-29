@@ -1,5 +1,6 @@
 from flasgger import Swagger
-from flask import Flask, Response, request
+from flask import Flask, Response, abort, request
+
 from schema_overseer_local import InvalidScheme
 
 from .payload.registry import payload_schema_registry
@@ -23,7 +24,7 @@ payload_schema_registry.setup()
 
 
 @app.post("/log-site-search")
-def log_site_search():
+def log_site_search() -> str:
     """Log site search queries
     ---
     requestBody:
@@ -66,7 +67,7 @@ def log_site_search():
     try:
         context = payload_schema_registry.build(payload_dict)
     except InvalidScheme:
-        return Response("Invalid payload scheme", status=400)
+        abort(Response("Invalid payload scheme", status=400))
 
     message = f'User query for logging: "{context.log_entry}" at {context.log_datetime}'
 

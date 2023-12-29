@@ -29,3 +29,4 @@ ignore = ["E731"]
 ignore_missing_imports = true
 plugins = ["pydantic.mypy"]
 check_untyped_defs = true
+strict = true
