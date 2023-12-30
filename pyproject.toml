@@ -8,7 +8,7 @@ packages = [{ include = "schema_overseer_local" }]
 
 [tool.poetry.dependencies]
 pydantic = "^2.5.3"
-python = "3.8"
+python = "^3.8"
 
 
 [tool.poetry.group.dev.dependencies]
