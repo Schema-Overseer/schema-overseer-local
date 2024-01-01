@@ -1,11 +1,9 @@
 # Schema Overseer (local version)
 
-Schema compatibility manager for local repository.
+Helper to create a compatibility layer between inputs in different formats and other parts of application.
+
 For multi-repository service see [schema-overseer-service](https://github.com/Schema-Overseer/schema-overseer-service)
 
-## Use case
-
-This is a small helper to create compatibility layer between inputs in different formats and other parts of application.
 
 ## Installation
 
@@ -74,7 +72,7 @@ def app(raw_data: dict[str, Any]):
     try:
         context = schema_registry.build(source_dict=raw_data)
     except InvalidScheme:
-        return Response("Invalid payload scheme", status=400)
+        return Response('Invalid payload scheme', status=400)
 
     print(context.value)
     context.func()

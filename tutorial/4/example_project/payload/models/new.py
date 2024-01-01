@@ -12,12 +12,12 @@ class NewPayload(BaseModel):
     image: Optional[AnyHttpUrl] = None
     created_at: Optional[datetime.datetime] = None
 
-    @model_validator(mode="before")
+    @model_validator(mode='before')
+    @classmethod
     def check_source(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        MUTUALLY_REQUIRED_FIELDS = ["text", "image"]
-        if not any(field in values for field in MUTUALLY_REQUIRED_FIELDS):
-            raise ValueError(
-                f"At least one of the following fields must be present: {', '.join(MUTUALLY_REQUIRED_FIELDS)}"
-            )
+        mutually_required_fields = ['text', 'image']
+        if not any(field in values for field in mutually_required_fields):
+            msg = f"At least one of the following fields must be present: {', '.join(mutually_required_fields)}"
+            raise ValueError(msg)
 
         return values

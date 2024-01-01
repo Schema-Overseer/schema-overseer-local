@@ -1,18 +1,17 @@
 from inspect import signature
-from typing import Any, Callable, Dict, Generic, Optional, Sequence, Type, TypeVar, cast
+from typing import Any, Callable, Dict, Generic, Optional, Sequence, Type, TypeVar, cast, overload
 
-from typing import overload
 from pydantic import BaseModel, ValidationError
 
 from .utils import import_string
 
 
-class InvalidScheme(Exception):
+class InvalidSchemeError(Exception):
     pass
 
 
-Ctx = TypeVar("Ctx")
-SchemeModel = TypeVar("SchemeModel", bound=BaseModel)
+Ctx = TypeVar('Ctx')
+SchemeModel = TypeVar('SchemeModel', bound=BaseModel)
 
 
 class SchemaRegistry(Generic[Ctx]):
@@ -21,9 +20,7 @@ class SchemaRegistry(Generic[Ctx]):
     _storage: Dict[Type[BaseModel], Optional[Callable[[BaseModel], Ctx]]]
     _setup_done: bool
 
-    def __init__(
-        self, context_type: Type[Ctx], discovery_paths: Sequence[str] = ()
-    ) -> None:
+    def __init__(self, context_type: Type[Ctx], discovery_paths: Sequence[str] = ()) -> None:
         self._context_type = context_type
         self._discovery_paths = discovery_paths
         self._storage = {}
@@ -33,9 +30,7 @@ class SchemaRegistry(Generic[Ctx]):
         self._storage[model] = None
         return model
 
-    def add_builder(
-        self, builder_func: Callable[[SchemeModel], Ctx]
-    ) -> Callable[[SchemeModel], Ctx]:
+    def add_builder(self, builder_func: Callable[[SchemeModel], Ctx]) -> Callable[[SchemeModel], Ctx]:
         sign = signature(builder_func)
         assert len(sign.parameters) == 1
         parameter = next(iter(sign.parameters.values()))
@@ -85,4 +80,4 @@ class SchemaRegistry(Generic[Ctx]):
                 return builder(obj)
             except ValidationError:
                 pass
-        raise InvalidScheme()
+        raise InvalidSchemeError()

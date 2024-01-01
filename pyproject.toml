@@ -1,9 +1,18 @@
 [tool.poetry]
 name = "schema-overseer-local"
 version = "0.1.0"
-description = ""
+description = "Helper to create a compatibility layer between inputs in different formats and other parts of application."
+license = "MIT"
 authors = ["Nik Sergievskii <nnonexistent@gmail.com>"]
+readme = "README.md"
+homepage = "https://github.com/Schema-Overseer/schema-overseer-local"
+repository = "https://github.com/Schema-Overseer/schema-overseer-local"
 packages = [{ include = "schema_overseer_local" }]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
 
 
 [tool.poetry.dependencies]
@@ -30,8 +39,35 @@ line-length = 119
 
 
 [tool.ruff.lint]
-select = ["E1", "E4", "E7", "E9", "F", "W"]
-ignore = ["E731"]
+extend-select = [
+    "A",
+    "ASYNC",
+    "B",
+    "BLE",
+    "C",
+    "E1",
+    "EM",
+    "EXE",
+    "FBT",
+    "G",
+    "INP",
+    "N",
+    "PERF",
+    "PGH",
+    "PIE",
+    "PT",
+    "PTH",
+    "RUF",
+    "S",
+    "SIM",
+    "UP",
+    "W",
+]
+ignore = ["E731", "B011", "S101", "PT015"]
+
+
+[tool.ruff.format]
+quote-style = "single"
 
 
 [tool.mypy]

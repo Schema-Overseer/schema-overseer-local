@@ -7,10 +7,10 @@ from schema_overseer_local import SchemaRegistry
 
 
 @pytest.mark.parametrize(
-    "raw_data",
+    'raw_data',
     [
-        {"value": "123"},
-        {"renamed_value": 123},
+        {'value': '123'},
+        {'renamed_value': 123},
     ],
 )  # type: ignore[misc]
 def test_default_use_case(raw_data: Dict[str, Any]) -> None:
@@ -40,4 +40,4 @@ def test_default_use_case(raw_data: Dict[str, Any]) -> None:
 
     context = schema_registry.build(source_dict=raw_data)
 
-    assert context.value == "123"
+    assert context.value == '123'

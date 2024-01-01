@@ -1,4 +1,5 @@
-from typing import List, Optional
+from typing import Any, Dict, List, Optional, Type
+
 from pydantic import AnyHttpUrl, BaseModel, ValidationError
 
 
@@ -19,28 +20,28 @@ class NewPayload(BasePayload):
     image: Optional[AnyHttpUrl] = None
 
     def to_message(self) -> str:
-        text_log_entry = "<no text>" if self.text is None else self.text
-        image_log_entry = "empty" if self.image is None else self.image
+        text_log_entry = '<no text>' if self.text is None else self.text
+        image_log_entry = 'empty' if self.image is None else self.image
         return f'{text_log_entry} | <image "{image_log_entry}">'
 
 
-class InvalidPayload(Exception):
+class InvalidPayloadError(Exception):
     pass
 
 
-payload_models: List[type[BasePayload]] = [
+payload_models: List[Type[BasePayload]] = [
     OldPayload,
     NewPayload,
 ]
 
 
-def build_log_entry(value: dict) -> str:
+def build_log_entry(value: Dict[str, Any]) -> str:
     for model in payload_models:
         try:
             payload = model.model_validate(value)
             return payload.to_message()
-
-        except ValidationError:
+        except ValidationError:  # noqa: PERF203
             continue
     else:
-        raise InvalidPayload("No suitable payload scheme found for given input")
+        msg = 'No suitable payload scheme found for given input'
+        raise InvalidPayloadError(msg)
