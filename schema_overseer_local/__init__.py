@@ -1,4 +1,4 @@
-from inspect import signature
+import inspect
 from typing import Any, Callable, Dict, Generic, Optional, Sequence, Type, TypeVar, cast, overload
 
 from pydantic import BaseModel, ValidationError
@@ -7,38 +7,70 @@ from .utils import import_string
 
 
 class InvalidSchemeError(Exception):
-    pass
+    """Could be raised in runtime during SchemaRegistry.build()"""
 
 
-Ctx = TypeVar('Ctx')
-SchemeModel = TypeVar('SchemeModel', bound=BaseModel)
+class SchemaOverseerSetupError(Exception):
+    """Could be raised at registration of schema or builders or during SchemaRegistry.setup()"""
 
 
-class SchemaRegistry(Generic[Ctx]):
-    _context_type: Type[Ctx]
+_OutputType = TypeVar('_OutputType')
+_InputScheme = TypeVar('_InputScheme', bound=BaseModel)
+
+
+class SchemaRegistry(Generic[_OutputType]):
+    _output_type: Type[_OutputType]
     _discovery_paths: Sequence[str]
-    _storage: Dict[Type[BaseModel], Optional[Callable[[BaseModel], Ctx]]]
+    _storage: Dict[Type[BaseModel], Optional[Callable[[BaseModel], _OutputType]]]
     _setup_done: bool
 
-    def __init__(self, context_type: Type[Ctx], discovery_paths: Sequence[str] = ()) -> None:
-        self._context_type = context_type
+    def __init__(self, output_type: Type[_OutputType], discovery_paths: Sequence[str] = ()) -> None:
+        self._output_type = output_type
         self._discovery_paths = discovery_paths
         self._storage = {}
         self._setup_done = False
 
-    def add_scheme(self, model: Type[SchemeModel]) -> Type[SchemeModel]:
+    def add_scheme(self, model: Type[_InputScheme]) -> Type[_InputScheme]:
         self._storage[model] = None
         return model
 
-    def add_builder(self, builder_func: Callable[[SchemeModel], Ctx]) -> Callable[[SchemeModel], Ctx]:
-        sign = signature(builder_func)
-        assert len(sign.parameters) == 1
-        parameter = next(iter(sign.parameters.values()))
+    def add_builder(
+        self, builder_func: Callable[[_InputScheme], _OutputType]
+    ) -> Callable[[_InputScheme], _OutputType]:
+        sign = inspect.signature(builder_func)
+
+        if len(sign.parameters) < 1:
+            msg = f'Builder "{builder_func.__name__}" doesn\'t have argument for the input data'
+            raise SchemaOverseerSetupError(msg)
+
+        parameter, *subsequent_params = sign.parameters.values()
+
+        if not all(p.default is not inspect._empty for p in subsequent_params):
+            msg = f'Builder "{builder_func.__name__}" has too many arguments without default values'
+            raise SchemaOverseerSetupError(msg)
+
         model = parameter.annotation
 
-        assert model in self._storage
-        assert sign.return_annotation == self._context_type
-        builder_func = cast(Callable[[BaseModel], Ctx], builder_func)
+        if model is inspect._empty:
+            msg = f'Argument type annotation is missing for builder "{builder_func.__name__}"'
+            raise SchemaOverseerSetupError(msg)
+
+        if model not in self._storage:
+            msg = f'Attempt to register builder for the unregistered scheme: {model.__name__}'
+            raise SchemaOverseerSetupError(msg)
+
+        if sign.return_annotation is inspect._empty:
+            msg = f'Return type annotation is missing for builder "{builder_func.__name__}"'
+            raise SchemaOverseerSetupError(msg)
+
+        if sign.return_annotation != self._output_type:
+            msg = (
+                f'Return type annotation of builder "{builder_func.__name__}" '
+                f'must be "{self._output_type}" instead of "{sign.return_annotation}"'
+            )
+            raise SchemaOverseerSetupError(msg)
+
+        builder_func = cast(Callable[[BaseModel], _OutputType], builder_func)
 
         self._storage[model] = builder_func
         return builder_func
@@ -47,15 +79,20 @@ class SchemaRegistry(Generic[Ctx]):
         for path in self._discovery_paths:
             import_string(path)
 
-        assert not any(builder is None for builder in self._storage.values())
+        if any(builder is None for builder in self._storage.values()):
+            schema_without_builders = ', '.join(s.__name__ for s, b in self._storage.items() if b is None)
+            msg = f'Missing builders for the following schema: {schema_without_builders}'
+            raise SchemaOverseerSetupError(msg)
         self._setup_done = True
 
     @overload
-    def build(self, *, source_dict: Dict[str, Any], source_object: None = None) -> Ctx:
+    def build(self, *, source_dict: Dict[str, Any], source_object: None = None) -> _OutputType:
+        """Build output object from dict"""
         ...
 
     @overload
-    def build(self, *, source_object: Any, source_dict: None = None) -> Ctx:
+    def build(self, *, source_object: Any, source_dict: None = None) -> _OutputType:
+        """Build output object from instance using attributes"""
         ...
 
     def build(
@@ -63,9 +100,9 @@ class SchemaRegistry(Generic[Ctx]):
         *,
         source_dict: Optional[Dict[str, Any]] = None,
         source_object: Optional[Any] = None,
-    ) -> Ctx:
-        assert self._setup_done
-        assert (source_dict is not None) ^ (source_object is not None)
+    ) -> _OutputType:
+        assert self._setup_done, 'setup() method must be called before building'
+        assert (source_dict is None) ^ (source_object is None), 'Use either `source_dict` or `source_object` arguments'
 
         for model, builder in self._storage.items():
             assert builder is not None
