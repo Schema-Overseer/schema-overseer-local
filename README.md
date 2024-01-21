@@ -1,9 +1,30 @@
-# Schema Overseer (local version)
+# Schema Overseer – Local
 
-Helper to create an adapter between inputs in different formats and other parts of an application.
+*This is a local version of Schema Overseer, intented to use in a single repository. For the multi-repository service see [schema-overseer-service](https://github.com/Schema-Overseer/schema-overseer-service).*
 
-For multi-repository service see [schema-overseer-service](https://github.com/Schema-Overseer/schema-overseer-service)
+Schema Overseer addresses a crucial challenge with data formats synchronization, such as schemas or configurations:
+- Data formats evolve over time;
+- In software development, the need to simultaneously support both legacy and new data formats is widespread.
+- Mismatches between input data format and the corresponding code can lead to unexpected and hard-to-debug runtime errors.
+- As the number of supported data formats increases, application code often becomes less maintainable.
 
+Schema Overseer ensures strict adherence to defined data formats and raises an error in case of attempting to process unsupported input schemas.
+
+In more technical terms, Schema Overseer helps to create an [adapter](https://en.wikipedia.org/wiki/Adapter_pattern) between inputs with different schemas and other components within an application.
+
+## Features
+
+- it has very detailed runtime checks;
+    - it provides type checking; / Type hinting validation
+    - and it is easily extensible.
+- A convenient place to verify incoming data and convert to a specific format
+
+
+## Use Cases and Tutorials
+
+1. **Manage metadata for different Machine Learning models:** TODO
+
+2. **Maintain multiple version of external-facting API:** TODO
 
 ## Installation
 
@@ -11,29 +32,29 @@ For multi-repository service see [schema-overseer-service](https://github.com/Sc
 pip install schema-overseer-local
 ```
 
-## Usage
+## Quick Start
 
-1. Define the output type and registry instance:
+1. Create a file `adapter.py` to define the adapter logic. For better practices, consider using [multiple files](#Using-miltiple-Python-files).
+
+2. Define the output schema you plan to work with. <br>
+The output schema could be anything, but we will use `dataclass` as a good practice. Attributes in the output can be any python objects, including non-serializables. Output can be designed with the same behaviour as the original input object, or with a completely different.
 
     ```python
-    from typing import Callable
-    from dataclasses import dataclass
-    from schema_overseer_local import SchemaRegistry
-
-    @dataclass  # output type could be anything, dataclass is just a good example
+    @dataclass
     class Output:
         value: int
-        function: Callable  # output object can contain any python objects, not just serializable ones
+        function: Callable
+    ```
 
+3. Create the `SchemaRegistry` instance for `Output`.
+
+    ```python
     schema_registry = SchemaRegistry(Output)
     ```
 
-
-2. Define input schema using [pydantic](https://docs.pydantic.dev/) and register them
+4. Define the input schema using [pydantic](https://docs.pydantic.dev/) and register them in `schema_registry`.
 
     ```python
-    from pydantic import BaseModel
-
     @schema_registry.add_scheme
     class OldInputFormat(BaseModel):
         value: str
@@ -43,8 +64,7 @@ pip install schema-overseer-local
         renamed_value: int
     ```
 
-
-3. Implement builders - function to convert each registered input to an output object
+5. Implement builders - functions to convert each registered input to `Output`. <br> Builders require type hinting to link input formats and `Output`.
 
     ```python
     @schema_registry.add_builder
@@ -62,7 +82,11 @@ pip install schema-overseer-local
         )
     ```
 
-4. Use it in the application context
+6. Finally, use `schema_registry` in application to get validated output or handle the exception.
+
+    <details>
+
+    <summary>Show code</summary>
 
     ```python
     schema_registry.setup()  # see "Discovery" chapter in documentation
@@ -71,42 +95,70 @@ pip install schema-overseer-local
         try:
             output = schema_registry.build(source_dict=raw_data)  # build output object
         except InvalidScheme as error:
-            raise MyApplicationError() from error  # Handle the exception
+            raise MyApplicationError() from error  # handle the exception
 
-        # Use output object
+        # use output object
         output.func()
         return output.value
 
     ```
 
+    </details>
+
+7. See the full working example:
+
+    <details>
+
+    <summary>Show code</summary>
+
+    TODO
+
+    ```python
+    ```
+
+    </details>
+
 
 ## FAQ
 
-TODO
-
-- Why?
-- Looks like overhead but in more complex cases it's not
-- Code separation
-- A convenient place to verify incoming data and convert to a specific format
-- Type hinting validation
-- Why rely on type hinting
 
 
-## Discovery and managing dependencies
+- **Q:** Why is this project exists? Isn't it too much overhead for a such simple task?<br>
+**A:** The main goal of `schema-overseer-local` is to serve as a fast and simple introduction to `schema-overseer-service`.
 
-TODO
+- **Q:** How is this project better than an adapter I can code in an hour? <br>
+**A:** `schema-overseer-local` has three important benefits:
+    - it has very detailed runtime checks;
+    - it provides type checking;
+    - and it is easily extensible.
 
+- **Q:** Why does `SchemaRegistry` use type hinting in runtime?
+**A:** `schema-overseer-local` uses the same pattern as `pydantic` and `FastAPI` for input and output validation in both runtime and static analysis stages.
+**A:** `schema-overseer-local` uses the type hinting at runtime to ensure
+ same pattern as `pydantic` and `FastAPI` for input and output validation in both runtime and static analysis stages.
 
-## Strict self-check
+## Usage
 
-TODO
-
-
-## Object as a source
+### Using miltiple Python files
 
 TODO
 
 
-## Tutorial
+### Discovery and managing dependencies
 
-Please refer to the tutorial, describing use case in details [here](TODO)
+TODO
+
+
+### Runtime safety and strict self-checks
+
+TODO
+
+
+### Object as a source
+
+TODO
+
+
+### Use one of the input scheme as output
+
+TODO
