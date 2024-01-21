@@ -1,30 +1,29 @@
 # Schema Overseer – Local
 
-*This is a local version of Schema Overseer, intented to use in a single repository. For the multi-repository service see [schema-overseer-service](https://github.com/Schema-Overseer/schema-overseer-service).*
+*This is a local version of Schema Overseer, intended to use in a single repository. For the multi-repository service see [schema-overseer-service](https://github.com/Schema-Overseer/schema-overseer-service).*
 
-Schema Overseer addresses a crucial challenge with data formats synchronization, such as schemas or configurations:
-- Data formats evolve over time;
-- In software development, the need to simultaneously support both legacy and new data formats is widespread.
-- Mismatches between input data format and the corresponding code can lead to unexpected and hard-to-debug runtime errors.
-- As the number of supported data formats increases, application code often becomes less maintainable.
+**Schema Overseer** ensures strict adherence to defined data formats and raises an exception in case of attempting to process unsupported input schema.<br>
+In more technical terms, it is an [adapter](https://en.wikipedia.org/wiki/Adapter_pattern) between inputs with different schema and other application components.
 
-Schema Overseer ensures strict adherence to defined data formats and raises an error in case of attempting to process unsupported input schemas.
+#### Why is it important?
+- Data formats evolve over time
+- Developers need to simultaneously support both legacy and new data formats
+- Mismatches between input data format and the corresponding code can lead to unexpected and hard-to-debug runtime errors
+- As the number of supported data formats increases, application code often becomes less maintainable
 
-In more technical terms, Schema Overseer helps to create an [adapter](https://en.wikipedia.org/wiki/Adapter_pattern) between inputs with different schemas and other components within an application.
-
-## Features
-
-- it has very detailed runtime checks;
-    - it provides type checking; / Type hinting validation
-    - and it is easily extensible.
-- A convenient place to verify incoming data and convert to a specific format
+#### Features
+- Straightforward extensibility
+- Static analysis checks via type checking
+- Detailed runtime checks
+- Incoming data validation with [pydantic](https://docs.pydantic.dev/)
 
 
 ## Use Cases and Tutorials
 
-1. **Manage metadata for different Machine Learning models:** TODO
+1. [Maintain multiple version of external-facing API](/tutorial)
 
-2. **Maintain multiple version of external-facting API:** TODO
+2. [Manage metadata for different Machine Learning models](TODO)
+
 
 ## Installation
 
@@ -34,10 +33,11 @@ pip install schema-overseer-local
 
 ## Quick Start
 
-1. Create a file `adapter.py` to define the adapter logic. For better practices, consider using [multiple files](#Using-miltiple-Python-files).
+1. Create a file `adapter.py` to define the adapter logic.<br>
+For quick start we will use single file, but in a real application it's better to use [multiple files](#using-miltiple-python-files).
 
-2. Define the output schema you plan to work with. <br>
-The output schema could be anything, but we will use `dataclass` as a good practice. Attributes in the output can be any python objects, including non-serializables. Output can be designed with the same behaviour as the original input object, or with a completely different.
+2. Define the output schema you plan to work with.<br>
+The output schema could be anything, for this tutorial we will use `dataclass`. Attributes in the output can be any python objects, including non-serializables. Output can be designed with the same behavior as the original input object, or with a completely different. Here is example of different behavior.
 
     ```python
     @dataclass
@@ -64,82 +64,63 @@ The output schema could be anything, but we will use `dataclass` as a good pract
         renamed_value: int
     ```
 
-5. Implement builders - functions to convert each registered input to `Output`. <br> Builders require type hinting to link input formats and `Output`.
+5. Implement builders - functions to convert each registered input to `Output`.<br>
+Builders require type hinting to link input formats and `Output`.
 
     ```python
     @schema_registry.add_builder
     def old_builder(data: OldInputFormat) -> Output:
         return Output(
             value=data.value,
-            func=my_function,
+            function=my_function,
         )
 
     @schema_registry.add_builder
     def new_builder(data: NewInputFormat) -> Output:
         return Output(
             value=data.renamed_value,
-            func=my_other_function,
+            function=my_other_function,
         )
     ```
 
-6. Finally, use `schema_registry` in application to get validated output or handle the exception.
-
-    <details>
-
-    <summary>Show code</summary>
+6. Finally, use `schema_registry` inside the application to get validated output or handle the exception.
 
     ```python
     schema_registry.setup()  # see "Discovery" chapter in documentation
 
-    def app(raw_data: dict[str, Any]):
+    def my_service(raw_data: dict[str, Any]):
         try:
             output = schema_registry.build(source_dict=raw_data)  # build output object
-        except InvalidScheme as error:
+        except InvalidSchemeError as error:
             raise MyApplicationError() from error  # handle the exception
 
         # use output object
-        output.func()
+        output.function()
         return output.value
-
     ```
 
-    </details>
 
-7. See the full working example:
-
-    <details>
-
-    <summary>Show code</summary>
-
-    TODO
-
-    ```python
-    ```
-
-    </details>
+Full quickstart example is [here](/tutorial/quickstart)
 
 
 ## FAQ
 
+- **Q:** Why is this project exists? Isn't it too much overhead for such a simple task?<br>
+  **A:** It depends on the scale of the different formats you need to support. For a few formats - yes, it could be an overhead. But in the projects with a lot of different formats to support, such extensive adapter layer could be very useful. Also `schema-overseer-local` serve as a fast and simple introduction to the `schema-overseer-service` for even more complicated cases with multiple teams and repositories.
 
-
-- **Q:** Why is this project exists? Isn't it too much overhead for a such simple task?<br>
-**A:** The main goal of `schema-overseer-local` is to serve as a fast and simple introduction to `schema-overseer-service`.
-
-- **Q:** How is this project better than an adapter I can code in an hour? <br>
-**A:** `schema-overseer-local` has three important benefits:
-    - it has very detailed runtime checks;
+- **Q:** How is this project better than an adapter I can code quickly myself?<br>
+  **A:** `schema-overseer-local` has three important benefits:
     - it provides type checking;
+    - it has very detailed runtime checks;
     - and it is easily extensible.
 
-- **Q:** Why does `SchemaRegistry` use type hinting in runtime?
-**A:** `schema-overseer-local` uses the same pattern as `pydantic` and `FastAPI` for input and output validation in both runtime and static analysis stages.
-**A:** `schema-overseer-local` uses the type hinting at runtime to ensure
- same pattern as `pydantic` and `FastAPI` for input and output validation in both runtime and static analysis stages.
+- **Q:** Why I have to use type hinting in builders?<br>
+  **A:** `schema-overseer-local` uses the same pattern as `pydantic` and `FastAPI` for input and output validation in both runtime and static analysis. It provides an extra layer of defense against code errors. Also it ensures proper data formats, even if your code is not entirely correctly typed or not checked with static analysis tools like [mypy](https://mypy-lang.org/).
+
 
 ## Usage
 
-### Using miltiple Python files
+### Using multiple Python files
 
 TODO
 
