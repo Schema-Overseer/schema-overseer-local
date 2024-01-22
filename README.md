@@ -1,5 +1,12 @@
 # Schema Overseer – Local
 
+[![GA test](https://github.com/Schema-Overseer/schema-overseer-local/actions/workflows/test.yml/badge.svg)](https://github.com/Schema-Overseer/schema-overseer-local/actions)
+[![PyPI](https://img.shields.io/pypi/v/schema-overseer-local)](https://pypi.org/project/schema-overseer-local/)
+[![License](https://img.shields.io/pypi/l/schema-overseer-local)](./LICENSE)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/schema-overseer-local)](https://pypi.org/project/schema-overseer-local/)
+[![PyPI - Format](https://img.shields.io/pypi/format/schema-overseer-local)](https://pypi.org/project/schema-overseer-local/)
+
+
 *This is a local version of Schema Overseer, intended to use in a single repository. For the multi-repository service see [schema-overseer-service](https://github.com/Schema-Overseer/schema-overseer-service).*
 
 **Schema Overseer** ensures strict adherence to defined data formats and raises an exception in case of attempting to process unsupported input schema.<br>
