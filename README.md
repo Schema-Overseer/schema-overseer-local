@@ -44,7 +44,7 @@ pip install schema-overseer-local
 For quick start we will use single file, but in a real application it's better to use [multiple files](#using-miltiple-python-files).
 
 2. Define the output schema you plan to work with.<br>
-The output schema could be anything, for this tutorial we will use `dataclass`. Attributes in the output can be any python objects, including non-serializables. Output can be designed with the same behavior as the original input object, or with a completely different. Here is example of different behavior.
+The output schema could be any object. For the tutorial purpose we will use `dataclass`. The output schema attributes could be any python objects, including non-serializables. Output could have the same behavior as the original input object, or a completely different one. Here is example of different behavior.
 
     ```python
     @dataclass
@@ -113,7 +113,7 @@ Full quickstart example is [here](/tutorial/quickstart)
 ## FAQ
 
 - **Q:** Why is this project exists? Isn't it too much overhead for such a simple task?<br>
-  **A:** It depends on the scale of the different formats you need to support. For a few formats - yes, it could be an overhead. But in the projects with a lot of different formats to support, such extensive adapter layer could be very useful. Also `schema-overseer-local` serve as a fast and simple introduction to the `schema-overseer-service` for even more complicated cases with multiple teams and repositories.
+  **A:** It depends on the scale of the different formats you need to support. In case of a few formats to support, `schema-overseer-local` would be an overhead indeed. But in the projects with lots of different formats, such extensive adapter layer could be helpful. Another goal of `schema-overseer-local` is to serve as a fast and simple introduction to `schema-overseer-service` for sophisticated use cases with multiple teams and repositories to work with.
 
 - **Q:** How is this project better than an adapter I can code quickly myself?<br>
   **A:** `schema-overseer-local` has three important benefits:
@@ -122,7 +122,7 @@ Full quickstart example is [here](/tutorial/quickstart)
     - and it is easily extensible.
 
 - **Q:** Why I have to use type hinting in builders?<br>
-  **A:** `schema-overseer-local` uses the same pattern as `pydantic` and `FastAPI` for input and output validation in both runtime and static analysis. It provides an extra layer of defense against code errors. Also it ensures proper data formats, even if your code is not entirely correctly typed or not checked with static analysis tools like [mypy](https://mypy-lang.org/).
+  **A:** `schema-overseer-local` uses the same pattern as `pydantic` and `FastAPI` for input and output validation in both runtime and static analysis. It provides an extra layer of defense against code errors. Even if your code is not entirely correctly typed or not checked with static analysis tools like [mypy](https://mypy-lang.org/), the data is still validated.
 
 
 ## Usage
