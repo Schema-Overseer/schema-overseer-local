@@ -1,6 +1,7 @@
 # Schema Overseer – Local
 
-[![GA test](https://github.com/Schema-Overseer/schema-overseer-local/actions/workflows/test.yml/badge.svg)](https://github.com/Schema-Overseer/schema-overseer-local/actions)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen)](https://github.com/pre-commit/pre-commit)
+[![GA test](https://github.com/Schema-Overseer/schema-overseer-local/actions/workflows/ci.yml/badge.svg)](https://github.com/Schema-Overseer/schema-overseer-local/actions)
 [![PyPI](https://img.shields.io/pypi/v/schema-overseer-local)](https://pypi.org/project/schema-overseer-local/)
 [![License](https://img.shields.io/pypi/l/schema-overseer-local)](./LICENSE)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/schema-overseer-local)](https://pypi.org/project/schema-overseer-local/)
@@ -108,10 +109,7 @@ Builders require type hinting to link input formats and `Output`.
 
 
 Full quickstart example is [here](/tutorial/quickstart)<br>
-Run it:
-```bash
-poetry run python -m tutorial.quickstart.app
-```
+Run it: `poetry run python -m tutorial.quickstart.app`
 
 
 ## FAQ
