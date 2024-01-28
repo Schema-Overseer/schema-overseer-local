@@ -1,14 +1,16 @@
 #!/usr/bin/env python
-from typing import Any, Dict
+from __future__ import annotations
+
+from typing import Any
 
 from schema_overseer_local import InvalidSchemeError
 
-from adapter import schema_registry
+from .adapter import schema_registry
 
 schema_registry.setup()  # see "Discovery" chapter in documentation
 
 
-def my_service(raw_data: Dict[str, Any]):
+def my_service(raw_data: dict[str, Any]) -> int:
     try:
         output = schema_registry.build(source_dict=raw_data)  # build output object
     except InvalidSchemeError as error:
@@ -16,6 +18,7 @@ def my_service(raw_data: Dict[str, Any]):
 
     # use output object
     output.function()
+
     return output.value
 
 
@@ -24,6 +27,7 @@ class MyApplicationError(Exception):
 
 
 if __name__ == '__main__':
+    data: dict[str, Any]
     data = {'value': '1'}
     print(f'Input: {data}')
     result = my_service(data)

@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import inspect
-from typing import Any, Callable, Dict, Generic, Optional, Sequence, Type, TypeVar, cast, overload
+from typing import Any, Callable, Generic, Sequence, TypeVar, cast, overload
 
 from pydantic import BaseModel, ValidationError
 
@@ -19,18 +21,18 @@ _InputScheme = TypeVar('_InputScheme', bound=BaseModel)
 
 
 class SchemaRegistry(Generic[_OutputType]):
-    _output_type: Type[_OutputType]
+    _output_type: type[_OutputType]
     _discovery_paths: Sequence[str]
-    _storage: Dict[Type[BaseModel], Optional[Callable[[BaseModel], _OutputType]]]
+    _storage: dict[type[BaseModel], Callable[[BaseModel], _OutputType] | None]
     _setup_done: bool
 
-    def __init__(self, output_type: Type[_OutputType], discovery_paths: Sequence[str] = ()) -> None:
+    def __init__(self, output_type: type[_OutputType], discovery_paths: Sequence[str] = ()) -> None:
         self._output_type = output_type
         self._discovery_paths = discovery_paths
         self._storage = {}
         self._setup_done = False
 
-    def add_scheme(self, model: Type[_InputScheme]) -> Type[_InputScheme]:
+    def add_scheme(self, model: type[_InputScheme]) -> type[_InputScheme]:
         self._storage[model] = None
         return model
 
@@ -86,7 +88,7 @@ class SchemaRegistry(Generic[_OutputType]):
         self._setup_done = True
 
     @overload
-    def build(self, *, source_dict: Dict[str, Any], source_object: None = None) -> _OutputType:
+    def build(self, *, source_dict: dict[str, Any], source_object: None = None) -> _OutputType:
         """Build output object from dict"""
         ...
 
@@ -98,8 +100,8 @@ class SchemaRegistry(Generic[_OutputType]):
     def build(
         self,
         *,
-        source_dict: Optional[Dict[str, Any]] = None,
-        source_object: Optional[Any] = None,
+        source_dict: dict[str, Any] | None = None,
+        source_object: Any | None = None,
     ) -> _OutputType:
         assert self._setup_done, 'setup() method must be called before building'
         assert (source_dict is None) ^ (source_object is None), 'Use either `source_dict` or `source_object` arguments'

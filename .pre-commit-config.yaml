@@ -1,0 +1,25 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.1.14
+    hooks:
+      - id: ruff
+        name: "Ruff lint"
+        args: [--fix]
+
+      - id: ruff
+        name: "Ruff sort imports"
+        args: [--select, I, --fix]
+
+      - id: ruff-format
+        name: "Ruff format"
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        name: "Mypy"
+        additional_dependencies:
+          - flasgger == 0.9.7.1
+          - flask == 3.0.1
+          - pydantic == 2.5.3
+          - pytest == 7.4.3

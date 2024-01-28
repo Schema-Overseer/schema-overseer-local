@@ -1,16 +1,16 @@
 from dataclasses import dataclass
 from typing import Callable
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 from schema_overseer_local import SchemaRegistry
 
 
-def my_function():
+def my_function() -> None:
     print('This was an old input')
 
 
-def my_other_function():
+def my_other_function() -> None:
     print('This was a new input')
 
 
@@ -35,10 +35,13 @@ class NewInputFormat(BaseModel):
 
 @schema_registry.add_builder
 def old_builder(data: OldInputFormat) -> Output:
-    return Output(
-        value=data.value,
-        function=my_function,
-    )
+    try:
+        return Output(
+            value=int(data.value),
+            function=my_function,
+        )
+    except ValueError as error:
+        raise ValidationError() from error
 
 
 @schema_registry.add_builder

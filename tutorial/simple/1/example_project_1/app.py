@@ -1,5 +1,5 @@
-from flask import Flask, request
 from flasgger import Swagger
+from flask import Flask, request
 
 app = Flask(__name__)
 swagger_config = Swagger.DEFAULT_CONFIG.copy()
