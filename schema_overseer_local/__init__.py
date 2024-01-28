@@ -4,6 +4,7 @@ import inspect
 from typing import Any, Callable, Generic, Sequence, TypeVar, cast, overload
 
 from pydantic import BaseModel, ValidationError
+from typing_extensions import get_type_hints
 
 from .utils import import_string
 
@@ -39,6 +40,7 @@ class SchemaRegistry(Generic[_OutputType]):
     def add_builder(
         self, builder_func: Callable[[_InputScheme], _OutputType]
     ) -> Callable[[_InputScheme], _OutputType]:
+        builder_type_hints = get_type_hints(builder_func)
         sign = inspect.signature(builder_func)
 
         if len(sign.parameters) < 1:
@@ -51,21 +53,21 @@ class SchemaRegistry(Generic[_OutputType]):
             msg = f'Builder "{builder_func.__name__}" has too many arguments without default values'
             raise SchemaOverseerSetupError(msg)
 
-        model = parameter.annotation
-
-        if model is inspect._empty:
+        if parameter.annotation is inspect._empty:
             msg = f'Argument type annotation is missing for builder "{builder_func.__name__}"'
             raise SchemaOverseerSetupError(msg)
 
+        model = builder_type_hints[parameter.name]
+
         if model not in self._storage:
-            msg = f'Attempt to register builder for the unregistered scheme: {model.__name__}'
+            msg = f'Attempt to register builder for the unregistered scheme: {model!r}'
             raise SchemaOverseerSetupError(msg)
 
         if sign.return_annotation is inspect._empty:
             msg = f'Return type annotation is missing for builder "{builder_func.__name__}"'
             raise SchemaOverseerSetupError(msg)
 
-        if sign.return_annotation != self._output_type:
+        if builder_type_hints['return'] != self._output_type:
             msg = (
                 f'Return type annotation of builder "{builder_func.__name__}" '
                 f'must be "{self._output_type}" instead of "{sign.return_annotation}"'

@@ -1,4 +1,4 @@
-name: Test
+name: CI
 
 on:
   push:
@@ -78,7 +78,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction --no-root --without test --with docs
+        run: poetry install --no-interaction --no-root --with docs
 
       - name: Load mypy cache
         uses: actions/cache@v4

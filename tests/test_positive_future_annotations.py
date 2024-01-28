@@ -1,7 +1,7 @@
-# ruff: noqa: FA100
+from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, Union
+from typing import Any
 
 import pytest
 from pydantic import BaseModel
@@ -47,7 +47,7 @@ schema_registry.setup()
         {'renamed_value': 123},
     ],
 )
-def test_dict_source(raw_data: Dict[str, Any]) -> None:
+def test_dict_source(raw_data: dict[str, Any]) -> None:
     output = schema_registry.build(source_dict=raw_data)
 
     assert output.value == '123'
@@ -70,7 +70,7 @@ class NewInput:
         NewInput(renamed_value=123),
     ],
 )
-def test_object_source(raw_data: Union[OldInput, NewInput]) -> None:
+def test_object_source(raw_data: OldInput | NewInput) -> None:
     output = schema_registry.build(source_object=raw_data)
 
     assert output.value == '123'
