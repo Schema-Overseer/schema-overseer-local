@@ -1,4 +1,6 @@
-from typing import Any, Dict, List, Optional, Type
+from __future__ import annotations
+
+from typing import Any
 
 from pydantic import AnyHttpUrl, BaseModel, ValidationError
 
@@ -16,8 +18,8 @@ class OldPayload(BasePayload):
 
 
 class NewPayload(BasePayload):
-    text: Optional[str] = None
-    image: Optional[AnyHttpUrl] = None
+    text: str | None = None
+    image: AnyHttpUrl | None = None
 
     def to_message(self) -> str:
         text_log_entry = '<no text>' if self.text is None else self.text
@@ -29,13 +31,13 @@ class InvalidPayloadError(Exception):
     pass
 
 
-payload_models: List[Type[BasePayload]] = [
+payload_models: list[type[BasePayload]] = [
     OldPayload,
     NewPayload,
 ]
 
 
-def build_log_entry(value: Dict[str, Any]) -> str:
+def build_log_entry(value: dict[str, Any]) -> str:
     for model in payload_models:
         try:
             payload = model.model_validate(value)

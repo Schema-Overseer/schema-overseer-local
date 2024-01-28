@@ -1,7 +1,7 @@
+from __future__ import annotations
+
 from flasgger import Swagger
 from flask import Flask, Response, request
-
-from .payloads import InvalidPayloadError, build_log_entry
 
 app = Flask(__name__)
 swagger_config = Swagger.DEFAULT_CONFIG.copy()
@@ -11,7 +11,7 @@ swagger_config.update(
         'openapi': '3.0.3',
         'title': 'Swagger | Example Project',
         'info': {
-            'version': '1.3',
+            'version': '1.2',
             'title': 'Example Project',
         },
     }
@@ -20,7 +20,7 @@ Swagger(app, config=swagger_config)
 
 
 @app.post('/log-site-search')
-def log_site_search() -> str:
+def log_site_search() -> str | Response:
     """Log site search queries
     ---
     requestBody:
@@ -56,11 +56,17 @@ def log_site_search() -> str:
               schema:
                 type: string
     """
-    payload_dict = request.get_json()
+    payload = request.get_json()
 
-    try:
-        log_entry = build_log_entry(payload_dict)
-    except InvalidPayloadError:
+    if 'query' in payload:
+        log_entry = payload['query']
+
+    elif 'text' in payload or 'image' in payload:
+        text_log_entry = payload.get('text', '<no text>')
+        image_log_entry = payload.get('image', 'empty')
+        log_entry = f'{text_log_entry} | <image "{image_log_entry}">'
+
+    else:
         return Response('Invalid payload scheme', status=400)
 
     message = f'User query for logging: "{log_entry}"'

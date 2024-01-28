@@ -22,11 +22,20 @@ python = "^3.8"
 
 [tool.poetry.group.dev.dependencies]
 mypy = "^1.8.0"
-ruff = "^0.1.9"
+ruff = "^0.1.14"
 
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.4.3"
+
+
+[tool.poetry.group.docs]
+optional = true
+
+
+[tool.poetry.group.docs.dependencies]
+flask = "^3.0.1"
+flasgger = "^0.9.7.1"
 
 
 [build-system]
@@ -36,6 +45,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
 line-length = 119
+target-version = "py38"
 
 
 [tool.ruff.lint]
@@ -47,8 +57,11 @@ extend-select = [
     "C",
     "E1",
     "EM",
+    "ERA",
     "EXE",
+    "FA",
     "FBT",
+    "FLY",
     "G",
     "INP",
     "N",
@@ -60,10 +73,17 @@ extend-select = [
     "RUF",
     "S",
     "SIM",
+    "T10",
+    "T20",
+    "TRY",
     "UP",
     "W",
 ]
 ignore = ["E731", "B011", "S101", "PT015"]
+
+
+[tool.ruff.per-file-ignores]
+"tutorial/**" = ["T20"] # disables checking for prints in tutorials
 
 
 [tool.ruff.format]
@@ -71,7 +91,13 @@ quote-style = "single"
 
 
 [tool.mypy]
-ignore_missing_imports = true
 plugins = ["pydantic.mypy"]
 check_untyped_defs = true
+ignore_missing_imports = true
+python_version = "3.8"
 strict = true
+strict_equality = true
+warn_redundant_casts = true
+warn_unreachable = true
+warn_unused_configs = true
+warn_unused_ignores = true

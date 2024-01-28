@@ -107,7 +107,11 @@ Builders require type hinting to link input formats and `Output`.
     ```
 
 
-Full quickstart example is [here](/tutorial/quickstart)
+Full quickstart example is [here](/tutorial/quickstart)<br>
+Run it:
+```bash
+poetry run python -m tutorial.quickstart.app
+```
 
 
 ## FAQ
