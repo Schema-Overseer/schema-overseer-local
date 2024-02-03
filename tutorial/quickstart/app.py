@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from schema_overseer_local import InvalidSchemeError
+from schema_overseer_local import BuildError
 
 from .adapter import schema_registry
 
@@ -13,7 +13,7 @@ schema_registry.setup()  # see "Discovery" chapter in documentation
 def my_service(raw_data: dict[str, Any]) -> int:
     try:
         output = schema_registry.build(source_dict=raw_data)  # build output object
-    except InvalidSchemeError as error:
+    except BuildError as error:
         raise MyApplicationError() from error  # handle the exception
 
     # use output object

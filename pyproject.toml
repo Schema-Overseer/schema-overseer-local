@@ -43,6 +43,10 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 
+[tool.pytest.ini_options]
+filterwarnings = ["error"]
+
+
 [tool.ruff]
 line-length = 119
 target-version = "py38"

@@ -45,5 +45,5 @@ def build_log_entry(value: dict[str, Any]) -> str:
         except ValidationError:  # noqa: PERF203
             continue
     else:
-        msg = 'No suitable payload scheme found for given input'
+        msg = 'No suitable payload schema found for given input'
         raise InvalidPayloadError(msg)

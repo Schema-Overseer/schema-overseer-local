@@ -67,7 +67,7 @@ def log_site_search() -> str | Response:
         log_entry = f'{text_log_entry} | <image "{image_log_entry}">'
 
     else:
-        return Response('Invalid payload scheme', status=400)
+        return Response('Invalid payload schema', status=400)
 
     message = f'User query for logging: "{log_entry}"'
 

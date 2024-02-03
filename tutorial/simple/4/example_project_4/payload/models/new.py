@@ -8,7 +8,7 @@ from pydantic import AnyHttpUrl, BaseModel, model_validator
 from ..registry import payload_schema_registry
 
 
-@payload_schema_registry.add_scheme
+@payload_schema_registry.add_schema
 class NewPayload(BaseModel):
     text: str | None = None
     image: AnyHttpUrl | None = None

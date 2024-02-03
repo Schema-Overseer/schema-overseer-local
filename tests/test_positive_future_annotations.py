@@ -17,12 +17,12 @@ class Output:
 schema_registry = SchemaRegistry(Output)
 
 
-@schema_registry.add_scheme
+@schema_registry.add_schema
 class OldInputFormat(BaseModel):
     value: str
 
 
-@schema_registry.add_scheme
+@schema_registry.add_schema
 class NewInputFormat(BaseModel):
     renamed_value: int
 
