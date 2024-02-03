@@ -6,6 +6,10 @@ from schema_overseer_local.exceptions import MultipleValidSchemasError
 
 
 def test_check_for_single_valid_schema() -> None:
+    """
+    Test that SchemaRegistry raises MultipleValidSchemasError when check_for_single_valid_schema is True
+    and there are multiple valid schemas
+    """
     schema_registry = SchemaRegistry(int, check_for_single_valid_schema=True)
 
     @schema_registry.add_schema
