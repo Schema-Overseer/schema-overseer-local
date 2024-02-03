@@ -1,7 +1,7 @@
 from flasgger import Swagger
 from flask import Flask, Response, abort, request
 
-from schema_overseer_local import InvalidSchemaError
+from schema_overseer_local import NoMatchingSchemaError
 
 from .payload.registry import payload_schema_registry
 
@@ -65,7 +65,7 @@ def log_site_search() -> str:
 
     try:
         context = payload_schema_registry.build(source_dict=payload_dict)
-    except InvalidSchemaError:
+    except NoMatchingSchemaError:
         abort(Response('Invalid payload schema', status=400))
 
     message = f'User query for logging: "{context.log_entry}" at {context.log_datetime}'

@@ -7,7 +7,7 @@ from typing import Any, Callable, Generic, Sequence, TypeVar, cast, overload
 from pydantic import BaseModel, TypeAdapter, ValidationError
 from typing_extensions import get_type_hints
 
-from .exceptions import InvalidSchemaError, OutputValidationError, SetupError
+from .exceptions import MultipleValidSchemasError, NoMatchingSchemaError, OutputValidationError, SetupError
 from .utils import import_string
 
 _OutputType = TypeVar('_OutputType')
@@ -16,6 +16,7 @@ _InputSchema = TypeVar('_InputSchema', bound=BaseModel)
 
 class SchemaRegistry(Generic[_OutputType]):
     validate_output: bool
+    check_for_single_valid_schema: bool
     _output_type: type[_OutputType]
     _discovery_paths: Sequence[str]
     _storage: dict[type[BaseModel], Callable[[BaseModel], _OutputType] | None]
@@ -27,12 +28,14 @@ class SchemaRegistry(Generic[_OutputType]):
         *,
         discovery_paths: Sequence[str] = (),
         validate_output: bool = False,
+        check_for_single_valid_schema: bool = False,
     ) -> None:
         self._output_type = output_type
         self._discovery_paths = discovery_paths
         self._storage = {}
         self._setup_done = False
         self.validate_output = validate_output
+        self.check_for_single_valid_schema = check_for_single_valid_schema
 
     def add_schema(self, model: type[_InputSchema]) -> type[_InputSchema]:
         self._storage[model] = None
@@ -109,14 +112,15 @@ class SchemaRegistry(Generic[_OutputType]):
         """
         Build output object from dict or instance using attributes.
         Raises:
-            InvalidSchemaError: if no input schema was matched
+            NoMatchingSchemaError: if no input schema was matched
             ValidateOutputError: if output validation failed
         """
         assert self._setup_done, 'setup() method must be called before building'
         assert (source_dict is None) ^ (source_object is None), 'Use either `source_dict` or `source_object` arguments'
 
-        for model, builder in self._storage.items():
-            assert builder is not None
+        valid_input_objects: list[tuple[type[BaseModel], BaseModel]] = []
+
+        for model in self._storage:
             try:
                 if source_dict is not None:
                     obj = model(**source_dict)
@@ -127,6 +131,21 @@ class SchemaRegistry(Generic[_OutputType]):
             except ValidationError:
                 continue
 
+            valid_input_objects.append((model, obj))
+            if not self.check_for_single_valid_schema:
+                break  # we already have one suitable input object
+
+        if not valid_input_objects:
+            raise NoMatchingSchemaError()
+
+        elif len(valid_input_objects) > 1 and self.check_for_single_valid_schema:
+            raise MultipleValidSchemasError()
+
+        else:
+            model, obj = valid_input_objects[0]
+            builder = self._storage[model]
+            assert builder is not None
+
             output = builder(obj)
 
             if self.validate_output:
@@ -136,7 +155,6 @@ class SchemaRegistry(Generic[_OutputType]):
                     raise OutputValidationError from error
             else:
                 return output
-        raise InvalidSchemaError()
 
     def perform_validate_output(self, output: _OutputType) -> _OutputType:
         """Override this method to provide custom output validation."""
