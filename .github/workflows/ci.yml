@@ -87,12 +87,12 @@ jobs:
       - name: Run ruff
         run: |
           source $VENV
-          ruff .
+          ruff check --output-format=github .
 
       - name: Check imports sorting
         run: |
           source $VENV
-          ruff check --select I .
+          ruff check --output-format=github --select I .
 
       - name: Run mypy
         run: |
