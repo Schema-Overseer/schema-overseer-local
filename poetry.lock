@@ -572,6 +572,21 @@ tomli = {version = ">=1.0.0", markers = "python_version < \"3.11\""}
 testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "setuptools", "xmlschema"]
 
 [[package]]
+name = "pytest-mypy-testing"
+version = "0.1.1"
+description = "Pytest plugin to check mypy output."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pytest-mypy-testing-0.1.1.tar.gz", hash = "sha256:31b1b8ec869b2029b2e15ba9913c7dc089b6197626efd559d6e3c5e763a0725e"},
+    {file = "pytest_mypy_testing-0.1.1-py3-none-any.whl", hash = "sha256:2c10a079e4333550f648e66e1ab7ab5fc53f7791a690584abba549398e3441d7"},
+]
+
+[package.dependencies]
+mypy = ">=0.931"
+pytest = ">=7,<8"
+
+[[package]]
 name = "pyyaml"
 version = "6.0.1"
 description = "YAML parser and emitter for Python"
@@ -837,4 +852,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "937de909ee290279c88717a5f6e6d975455e1630bf5ce9d037a1494d9068e7bb"
+content-hash = "08a22bd53cc4afafa7ae043e260567db1ba2f89bfeed179bd399d10295a00c09"
