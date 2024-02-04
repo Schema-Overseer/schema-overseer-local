@@ -212,17 +212,17 @@ schema_registry = SchemaRegistry(
 
 ### Runtime safety and strict self-checks
 
-Besides static type hint checks, `schema-overseer-local` also checks in runtime that:
-* all registered models have exactly one corresponding builder
-* all builders have proper call signature:
+In addition to static type hint checks, `schema-overseer-local` performs runtime checks to ensure:
+* each registered model has only one corresponding builder.
+* all builders have a proper call signature, which includes:
     * at least one argument for input data
-    * no more non-default arguments
+    * no additional non-default arguments
 * all builders have proper type hints
 
-Extra runtime checks:
-* with `validate_output=True` (`False` by default) checks if builder actually returns annotated type object (using pydantic)
-* by default `schema-overseer-local` use the builder from the first valid schema. But with `check_for_single_valid_schema=True` it checks if exactly one schema is valid for input data.<br>
-In case of multiple schemas being valid `MultipleValidSchemasError` will be raised.
+Additional runtime checks:
+* if set to validate_output=True (the default is False), it verifies whether the builder returns an object of the annotated type using pydantic.```
+* by default, `schema-overseer-local` selects the builder from the first valid schema. However, if `check_for_single_valid_schema=True` is enabled, it ensures only one schema is valid for the input data.<br>
+If multiple schemas are found to be valid, a `MultipleValidSchemasError` will be raised.
 
 
 ### Object as a source
