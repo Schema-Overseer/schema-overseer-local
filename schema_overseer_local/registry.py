@@ -95,7 +95,7 @@ class SchemaRegistry(Generic[_OutputType]):
 
     @overload
     def build(self, *, source_dict: dict[str, Any], source_object: None = None) -> _OutputType:
-        """Build output object from dict"""
+        """Build output object from dict-like object"""
         ...
 
     @overload
