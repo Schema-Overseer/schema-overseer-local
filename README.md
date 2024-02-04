@@ -124,13 +124,13 @@ poetry run python -m tutorial.quickstart.app
 
 ### Using multiple Python files
 
-While you can define registry, models and builders in one or two files, it's a generally a better idea to split them into different files (i.e. python modules).
+While you can define registry, models and builders in one or two files, it is usually a better idea to split them into different files, i.e., Python modules.
 
-Here are a few suggested file structures:
+There are different ways to do the file structure, we recommend one of the following:
 
-- Minimal - something to start with
-- Expanded builders - for the case when you have a lot of code for each builder
-- Detached output - for the case when you have a big output entity
+- Minimal - start with this one when you are still figuring out the best way to work with schema;
+- Expanded builders - useful for the case with lots of code for each builder;
+- Detached output - useful for for the case, when the output is a big or complex entity.
 
 <table><tr><td valign="top">
 Minimal
@@ -181,16 +181,16 @@ Detached output
 └── registry.py
 ```
 </td></tr></table>
-Models (i.e. input data formats) are first to be decoupled for two reasons:
-  * If they have inner models inside it would be harder to distinguish between these for different root models. (see [Q](#q-should-i-re-use-inner-pydantic-models-in-different-data-formats))
-  * If you would transition to [schema-overseer-service](https://github.com/Schema-Overseer/schema-overseer-service) the models would be sourced from outside of your code, so this split will come naturally.
+Models (i.e., input data formats) are decoupled first for two reasons:
+ * If models contain inner models inside, it would be harder to distinguish between inner models for different root models. (see [Q](#q-should-i-re-use-inner-pydantic-models-in-different-data-formats) )
+ * If you transition to [schema-overseer-service](https://github.com/Schema-Overseer/schema-overseer-service), the models are sourced from the outside of your code, so this split will come naturally.
 
 
-### Automatically load modules
+### Load modules automatically
 
 > [!NOTE]
-> Python will not load modules automatically, unless their are explicitly imported.<br>
-> To load all required modules `SchemaRegistry` has a `discovery_paths: Sequence[str]` argument.<br>
+> Python will not load modules automatically, unless they are explicitly imported.<br>
+> `SchemaRegistry` has a `discovery_paths: Sequence[str]` argument to load all required models.<br>
 > Specified modules and packages will be loaded at `SchemaRegistry.setup()`. <br>
 
 Definition (`SchemaRegistry(...)`) is decoupled with loading (`SchemaRegistry.setup()`) to prevent cycle imports, that's why calling `setup()` is required.
