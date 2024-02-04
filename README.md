@@ -65,11 +65,11 @@ The output schema could be any object. For the tutorial purpose we will use `dat
 4. **Input schemas**. Define the input schemas using [pydantic](https://docs.pydantic.dev/) and register them in `schema_registry`.
 
     ```python
-    @schema_registry.add_scheme
+    @schema_registry.add_schema
     class OldInputFormat(BaseModel):
         value: str
 
-    @schema_registry.add_scheme
+    @schema_registry.add_schema
     class NewInputFormat(BaseModel):
         renamed_value: int
     ```
@@ -101,7 +101,7 @@ Builders require type hinting to link input formats and `Output`.
     def my_service(raw_data: dict[str, Any]):
         try:
             output = schema_registry.build(source_dict=raw_data)  # build output object
-        except InvalidSchemeError as error:
+        except BuildError as error:
             raise MyApplicationError() from error  # handle the exception
 
         # use output object
@@ -225,7 +225,7 @@ TODO
 
 `source_dict` and `source_object` are mutually exclusive.
 
-### Use one of the input scheme as output
+### Use one of the input schema as output
 
 TODO
 

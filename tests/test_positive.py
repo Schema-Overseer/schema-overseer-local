@@ -1,4 +1,4 @@
-# ruff: noqa: FA100
+# ruff: noqa: FA100  # testing without future annotations
 
 from dataclasses import dataclass
 from typing import Any, Dict, Union
@@ -17,12 +17,12 @@ class Output:
 schema_registry = SchemaRegistry(Output)
 
 
-@schema_registry.add_scheme
+@schema_registry.add_schema
 class OldInputFormat(BaseModel):
     value: str
 
 
-@schema_registry.add_scheme
+@schema_registry.add_schema
 class NewInputFormat(BaseModel):
     renamed_value: int
 
@@ -48,6 +48,8 @@ schema_registry.setup()
     ],
 )
 def test_dict_source(raw_data: Dict[str, Any]) -> None:
+    """Tests that build method works with dict-like source"""
+
     output = schema_registry.build(source_dict=raw_data)
 
     assert output.value == '123'
@@ -71,6 +73,8 @@ class NewInput:
     ],
 )
 def test_object_source(raw_data: Union[OldInput, NewInput]) -> None:
+    """Tests that build method works with object source"""
+
     output = schema_registry.build(source_object=raw_data)
 
     assert output.value == '123'
