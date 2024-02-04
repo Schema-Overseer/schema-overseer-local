@@ -257,6 +257,7 @@ TODO
 #### Q: Should I re-use inner pydantic models in different data formats?
 
 <details><summary>Code example</summary>
+
 ```python
 class InnerModel(BaseModel):
     value: int
