@@ -128,9 +128,9 @@ While you can define registry, models and builders in one or two files, it is us
 
 There are different ways to do the file structure, we recommend one of the following:
 
-- Minimal - start with this one when you are still figuring out the best way to work with schema;
-- Expanded builders - useful for the case with lots of code for each builder;
-- Detached output - useful for for the case, when the output is a big or complex entity.
+- Minimal — start with this one, when you are still figuring out the best way to work
+- Expanded builders — useful for the case with lots of code for each builder
+- Detached output — useful for the case, when the output is a big or complex entity
 
 <table><tr><td valign="top">
 Minimal
@@ -181,8 +181,9 @@ Detached output
 └── registry.py
 ```
 </td></tr></table>
+
 Models (i.e., input data formats) are decoupled first for two reasons:
- * If models contain inner models inside, it would be harder to distinguish between inner models for different root models. (see [Q](#q-should-i-re-use-inner-pydantic-models-in-different-data-formats) )
+ * If models contain inner models inside, it would be harder to distinguish between inner models for different root models. (see [Q](#q-should-i-re-use-inner-pydantic-models-in-different-data-formats))
  * If you transition to [schema-overseer-service](https://github.com/Schema-Overseer/schema-overseer-service), the models are sourced from the outside of your code, so this split will come naturally.
 
 
