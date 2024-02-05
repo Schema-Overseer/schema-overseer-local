@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "schema-overseer-local"
-version = "0.1.0"
+version = "0.1.1"
 description = "Helper to create a compatibility layer between inputs in different formats and other parts of application."
 license = "MIT"
 authors = ["Nik Sergievskii <nnonexistent@gmail.com>"]
