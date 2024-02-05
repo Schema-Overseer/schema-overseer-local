@@ -212,7 +212,17 @@ schema_registry = SchemaRegistry(
 
 ### Runtime safety and strict self-checks
 
-TODO
+In addition to static type hint checks, `schema-overseer-local` performs runtime checks to ensure:
+* Each registered model has only one corresponding builder.
+* All builders have a proper call signature, which includes:
+    * One argument for the input data
+    * No additional non-default arguments
+* All builders have proper type hints
+
+Additional runtime checks:
+* If set to `validate_output=True` (the default is `False`), it verifies whether the builder returns an object of the annotated type using pydantic.
+* By default, `schema-overseer-local` selects the builder from the first valid schema. However, if `check_for_single_valid_schema=True` is enabled, it ensures only one schema is valid for the input data.<br>
+If multiple schemas are found to be valid, a `MultipleValidSchemasError` will be raised.
 
 
 ### Object as a source
@@ -245,8 +255,29 @@ TODO
   **A:** `schema-overseer-local` uses the same pattern as `pydantic` and `FastAPI` for input and output validation in both runtime and static analysis. It provides an extra layer of defense against code errors. Even if your code is not entirely correctly typed or not checked with static analysis tools like [mypy](https://mypy-lang.org/), the data is still validated.
 
 #### Q: Should I re-use inner pydantic models in different data formats?
-  **A:** No
-  <!-- TODO: Why DRY is not a good idea here -->
 
+<details><summary>Code example</summary>
+
+```python
+class InnerModel(BaseModel):
+    value: int
+
+
+class InputFormatV1(BaseModel):
+    inner: InnerModel
+```
+```python
+class InnerModelV2(BaseModel):
+    value: int
+
+
+class InputFormatV2(BaseModel):
+    inner: InnerModelV2  # or re-use InnerModel?
+```
+</details>
+
+  **A:** Not really. While it might be tempting to adhere to the DRY[^2] principle in this context, it's generally a better approach to fully separate nested pydantic models into distinct modules, avoiding their reuse even if they are identical.<br>
+  The primary rationale is future code maintainability: tracking modifications in reused models can be challenging, and the introduction of a new format version could require changes to the inner model, which would then demand separation regardless.
 
 [^1]: [Adapter pattern](https://en.wikipedia.org/wiki/Adapter_pattern)
+[^2]: [Don't repeat yourself](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself)
